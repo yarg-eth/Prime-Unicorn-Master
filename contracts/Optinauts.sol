@@ -11,8 +11,6 @@ import { IERC2981, IERC165 } from "@openzeppelin/contracts/interfaces/IERC2981.s
 contract Optinauts is ERC721, IERC2981, Ownable, ReentrancyGuard {
   using Strings for uint256;
 
-  string public provenanceHash;
-
   uint256 public constant MAX_SUPPLY = 10000;
   uint256 public maxWhitelistMint = 2;
   uint256 public maxMint = 10;
@@ -29,6 +27,7 @@ contract Optinauts is ERC721, IERC2981, Ownable, ReentrancyGuard {
   uint256 public publicPrice = 0.2 ether;
 
   bytes32 public merkleRoot;
+  mapping(address => bool) public whitelistClaimed;
   mapping(address => uint256) private _alreadyMinted;
 
   address public royalties;
@@ -47,10 +46,6 @@ contract Optinauts is ERC721, IERC2981, Ownable, ReentrancyGuard {
   }
 
   // Accessors
-
-  function setProvenanceHash(string calldata hash) public onlyOwner {
-    provenanceHash = hash;
-  }
 
   function setShareholderAddress(address _shareholderAddress) public onlyOwner {
     shareholderAddress = _shareholderAddress;

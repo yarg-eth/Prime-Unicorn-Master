@@ -19,7 +19,7 @@ const merkleRoot = merkleTree.getRoot();
 console.log('Whitelist Merkle Tree\n', merkleTree.toString(), 'Root Hash\n', merkleRoot.toString('hex'));
 
 // Server Side / API Implementation
-const claimingAddress = leafNodes[0];
+const claimingAddress = leafNodes[6];
 
 const hexProof = merkleTree.getHexProof(claimingAddress);
 
