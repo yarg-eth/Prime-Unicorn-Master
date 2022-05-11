@@ -7,7 +7,7 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 
 contract paySplit is PaymentSplitter, Ownable {
     
-    constructor (address[] memory _payees, uint256[] memory _shares) PaymentSplitter(_payees, _shares) payable onlyOwner{}
+    constructor (address[] memory _payees, uint256[] memory _shares) PaymentSplitter(_payees, _shares) payable onlyOwner {}
     
 }
 
