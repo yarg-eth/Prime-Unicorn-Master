@@ -7,9 +7,9 @@ import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 import "@openzeppelin/contracts/utils/cryptography/MerkleProof.sol";
 import "@openzeppelin/contracts/utils/Strings.sol";
 import "@openzeppelin/contracts/utils/Counters.sol";
-import { IERC2981, IERC165 } from "@openzeppelin/contracts/interfaces/IERC2981.sol";
+import { IERC165 } from "@openzeppelin/contracts/interfaces/IERC2981.sol";
 
-contract Optinauts is ERC721, IERC2981, Ownable, ReentrancyGuard {
+contract Optinauts is ERC721, Ownable, ReentrancyGuard {
   
   using Strings for uint256;
   using Counters for Counters.Counter;
@@ -22,42 +22,33 @@ contract Optinauts is ERC721, IERC2981, Ownable, ReentrancyGuard {
   string public baseURI;
 
   bool public isActive = false;
-  bool public whitelistIsActive = false;
 
-  uint256 public whitelistPrice = 0.15 ether;
-  uint256 public publicPrice = 0.2 ether;
+  uint256 public mintPrice = 0.15 ether;
 
   bytes32 public merkleRoot;
   mapping(address => bool) public whitelistClaimed;
   mapping(address => uint256) private _alreadyMinted;
 
-  address public shareholderAddress;
+  address public t1 = 0x6d6257976bd82720A63fb1022cC68B6eE7c1c2B0;
+  address public t2 = 0x74Fac8b17237e00724E06d20115b7ecFA3389281;
+  address public t3 = 0xb2e7e393E8C6Dfe9c311ce786e1E68459253839c;
+  address public t4 = 0xCaA8aEd2B9765461d6318f01223Da08964f955C3;
 
   constructor(
-    address _shareholderAddress,
     string memory _initialBaseURI
   ) ERC721("Optinauts", "OPTI") {
-    shareholderAddress = _shareholderAddress;
     baseURI = _initialBaseURI;
   }
 
   // Accessors
 
-  function setShareholderAddress(address _shareholderAddress) public onlyOwner {
-    shareholderAddress = _shareholderAddress;
-  }
-
-  function setRoyalties(address _shareholderAddress) public onlyOwner {
-    shareholderAddress = _shareholderAddress;
-  }
-
   function setActive(bool _isActive) public onlyOwner {
     isActive = _isActive;
   }
 
-  function setWhitelistActive(bool _whitelistIsActive) public onlyOwner {
-    whitelistIsActive = _whitelistIsActive;
-  }
+  function setPrice(uint256 _mintPrice) public onlyOwner() {
+        mintPrice = _mintPrice;
+    }
 
   function setMerkleProof(bytes32 _merkleRoot) public onlyOwner {
     merkleRoot = _merkleRoot;
@@ -89,10 +80,10 @@ contract Optinauts is ERC721, IERC2981, Ownable, ReentrancyGuard {
   ) public payable nonReentrant {
     address sender = _msgSender();
 
-    require(whitelistIsActive, "Whitelist sale is not open");
+    require(isActive, "Whitelist sale is not open");
     require(_verify(merkleProof, sender, maxWhitelistMint), "You are not whitelisted");
     require(amount <= maxWhitelistMint - _alreadyMinted[sender], "Insufficient mints left");
-    require(msg.value == whitelistPrice * amount, "Incorrect payable amount");
+    require(msg.value == mintPrice * amount, "Incorrect payable amount");
 
     _alreadyMinted[sender] += amount;
     _internalMint(sender, amount);
@@ -109,15 +100,19 @@ contract Optinauts is ERC721, IERC2981, Ownable, ReentrancyGuard {
 
     require(isActive, "Public sale is not open");
     require(amount <= maxMint - _alreadyMinted[sender], "Insufficient mints left");
-    require(msg.value == publicPrice * amount, "Incorrect payable amount");
+    require(msg.value == mintPrice * amount, "Incorrect payable amount");
     
     _alreadyMinted[sender] += amount;
     _internalMint(sender, amount);
   }
 
-  function withdraw() public onlyOwner {
-    payable(shareholderAddress).transfer(address(this).balance);
-  }
+  function withdrawAll() public payable onlyOwner {
+        uint256 _each = address(this).balance / 4;
+        require(payable(t1).send(_each), "Account is being paid out");
+        require(payable(t2).send(_each), "Account is being paid out");
+        require(payable(t3).send(_each), "Account is being paid out");
+        require(payable(t4).send(_each), "Account is being paid out");
+    }
   // Private
 
   function _internalMint(address to, uint256 amount) public onlyOwner {
@@ -136,19 +131,5 @@ contract Optinauts is ERC721, IERC2981, Ownable, ReentrancyGuard {
   ) private view returns (bool) {
     bytes32 leaf = keccak256(abi.encodePacked(sender, maxAmount.toString()));
     return MerkleProof.verify(merkleProof, merkleRoot, leaf);
-  }
-
-  // ERC165
-
-  function supportsInterface(bytes4 interfaceId) public view override(ERC721, IERC165) returns (bool) {
-    return interfaceId == type(IERC2981).interfaceId || super.supportsInterface(interfaceId);
-  }
-
-  // IERC2981
-
-  function royaltyInfo(uint256 _tokenId, uint256 _salePrice) external view returns (address, uint256 royaltyAmount) {
-    _tokenId; // silence solc warning
-    royaltyAmount = (_salePrice / 100) * 5;
-    return (shareholderAddress, royaltyAmount);
   }
 }
