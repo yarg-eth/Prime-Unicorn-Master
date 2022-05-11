@@ -6,19 +6,20 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 import "@openzeppelin/contracts/utils/cryptography/MerkleProof.sol";
 import "@openzeppelin/contracts/utils/Strings.sol";
+import "@openzeppelin/contracts/utils/Counters.sol";
 import { IERC2981, IERC165 } from "@openzeppelin/contracts/interfaces/IERC2981.sol";
 
 contract Optinauts is ERC721, IERC2981, Ownable, ReentrancyGuard {
+  
   using Strings for uint256;
+  using Counters for Counters.Counter;
+  Counters.Counter private _tokenSupply;
 
   uint256 public constant MAX_SUPPLY = 10000;
   uint256 public maxWhitelistMint = 2;
   uint256 public maxMint = 10;
-  uint256 private _currentId;
 
   string public baseURI;
-  string public baseExtension = ".json";
-  string private _contractURI;
 
   bool public isActive = false;
   bool public whitelistIsActive = false;
@@ -30,19 +31,14 @@ contract Optinauts is ERC721, IERC2981, Ownable, ReentrancyGuard {
   mapping(address => bool) public whitelistClaimed;
   mapping(address => uint256) private _alreadyMinted;
 
-  address public royalties;
   address public shareholderAddress;
 
   constructor(
     address _shareholderAddress,
-    address _royalties,
-    string memory _initialBaseURI,
-    string memory _initialContractURI
+    string memory _initialBaseURI
   ) ERC721("Optinauts", "OPTI") {
     shareholderAddress = _shareholderAddress;
-    royalties = _royalties;
     baseURI = _initialBaseURI;
-    _contractURI = _initialContractURI;
   }
 
   // Accessors
@@ -51,8 +47,8 @@ contract Optinauts is ERC721, IERC2981, Ownable, ReentrancyGuard {
     shareholderAddress = _shareholderAddress;
   }
 
-  function setRoyalties(address _royalties) public onlyOwner {
-    royalties = _royalties;
+  function setRoyalties(address _shareholderAddress) public onlyOwner {
+    shareholderAddress = _shareholderAddress;
   }
 
   function setActive(bool _isActive) public onlyOwner {
@@ -67,12 +63,12 @@ contract Optinauts is ERC721, IERC2981, Ownable, ReentrancyGuard {
     merkleRoot = _merkleRoot;
   }
 
-  function alreadyMinted(address addr) public view returns (uint256) {
-    return _alreadyMinted[addr];
+  function remainingSupply() public view returns (uint256) {
+    return MAX_SUPPLY - _tokenSupply.current();
   }
 
   function totalSupply() public view returns (uint256) {
-    return _currentId;
+    return _tokenSupply.current();
   }
 
   // Metadata
@@ -85,14 +81,6 @@ contract Optinauts is ERC721, IERC2981, Ownable, ReentrancyGuard {
     return baseURI;
   }
 
-  function contractURI() public view returns (string memory) {
-    return _contractURI;
-  }
-
-  function setContractURI(string memory uri) public onlyOwner {
-    _contractURI = uri;
-  }
-
   // Minting
 
   function whitelistMint(
@@ -102,8 +90,8 @@ contract Optinauts is ERC721, IERC2981, Ownable, ReentrancyGuard {
     address sender = _msgSender();
 
     require(whitelistIsActive, "Whitelist sale is not open");
-    require(amount <= maxWhitelistMint - _alreadyMinted[sender], "Insufficient mints left");
     require(_verify(merkleProof, sender, maxWhitelistMint), "You are not whitelisted");
+    require(amount <= maxWhitelistMint - _alreadyMinted[sender], "Insufficient mints left");
     require(msg.value == whitelistPrice * amount, "Incorrect payable amount");
 
     _alreadyMinted[sender] += amount;
@@ -132,12 +120,12 @@ contract Optinauts is ERC721, IERC2981, Ownable, ReentrancyGuard {
   }
   // Private
 
-  function _internalMint(address to, uint256 amount) private {
-    require(_currentId + amount <= MAX_SUPPLY, "Will exceed maximum supply");
+  function _internalMint(address to, uint256 amount) public onlyOwner {
+    require(_tokenSupply.current() + amount<= MAX_SUPPLY, "Will exceed maximum supply");
 
     for (uint256 i = 1; i <= amount; i++) {
-      _currentId++;
-      _safeMint(to, _currentId);
+      _tokenSupply.increment();
+      _safeMint(to, _tokenSupply.current());
     }
   }
 
@@ -161,6 +149,6 @@ contract Optinauts is ERC721, IERC2981, Ownable, ReentrancyGuard {
   function royaltyInfo(uint256 _tokenId, uint256 _salePrice) external view returns (address, uint256 royaltyAmount) {
     _tokenId; // silence solc warning
     royaltyAmount = (_salePrice / 100) * 5;
-    return (royalties, royaltyAmount);
+    return (shareholderAddress, royaltyAmount);
   }
 }
