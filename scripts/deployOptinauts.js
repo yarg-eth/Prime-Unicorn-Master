@@ -15,7 +15,7 @@ async function main() {
 
   // We get the contract to deploy
   const Optinauts = await hre.ethers.getContractFactory("Optinauts");
-  const optinauts = await Optinauts.deploy("0xf57b2c51ded3a29e6891aba85459d600256cf317","https://gateway.pinata.cloud/ipfs/Qme6dCutqqY4immM3b2u88A2hU1ExjKpG2h1T74dnZTSu5/giphy.gif");
+  const optinauts = await Optinauts.deploy("https://gateway.pinata.cloud/ipfs/Qme6dCutqqY4immM3b2u88A2hU1ExjKpG2h1T74dnZTSu5/giphy.gif");
   //mainnet = 0xa5409ec958c83c3f309868babaca7c86dcb077c1
 
   await optinauts.deployed();

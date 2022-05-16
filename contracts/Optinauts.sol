@@ -9,11 +9,6 @@ import "@openzeppelin/contracts/utils/Strings.sol";
 import "@openzeppelin/contracts/utils/Counters.sol";
 import { IERC165 } from "@openzeppelin/contracts/interfaces/IERC2981.sol";
 
-contract OwnableDelegateProxy { }
-contract OpenSeaProxyRegistry {
-  mapping(address => OwnableDelegateProxy) public proxies;
-}
-
 contract Optinauts is ERC721, Ownable, ReentrancyGuard {
   
   using Strings for uint256;
@@ -38,15 +33,12 @@ contract Optinauts is ERC721, Ownable, ReentrancyGuard {
   address public t2 = 0x74Fac8b17237e00724E06d20115b7ecFA3389281;
   address public t3 = 0xb2e7e393E8C6Dfe9c311ce786e1E68459253839c;
   address public t4 = 0xCaA8aEd2B9765461d6318f01223Da08964f955C3;
-  address public immutable proxyRegistryAddress; 
   //mainnet = 0xa5409ec958c83c3f309868babaca7c86dcb077c1
 
   constructor(
-    address _proxyRegistryAddress,
     string memory _initialBaseURI
   ) ERC721("Optinauts", "OPTI") {
     baseURI = _initialBaseURI;
-    proxyRegistryAddress = _proxyRegistryAddress;
   }
 
   // Accessors
@@ -132,13 +124,6 @@ contract Optinauts is ERC721, Ownable, ReentrancyGuard {
       _safeMint(to, _tokenSupply.current());
     }
   }
-
-  function isApprovedForAll(address _owner, address operator) public view override
-returns (bool) {
-  OpenSeaProxyRegistry proxyRegistry = OpenSeaProxyRegistry(proxyRegistryAddress);
-  if (address(proxyRegistry.proxies(_owner)) == operator) return true;
-  return super.isApprovedForAll(_owner, operator);
-}
 
   function _verify(
     bytes32[] calldata merkleProof,
