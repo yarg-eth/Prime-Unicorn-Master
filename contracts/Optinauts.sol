@@ -22,6 +22,7 @@ contract Optinauts is ERC721, Ownable, ReentrancyGuard {
   string public baseURI;
 
   bool public isActive = false;
+  bool public wlIsActive = false;
 
   uint256 public mintPrice = 0.15 ether;
 
@@ -45,6 +46,10 @@ contract Optinauts is ERC721, Ownable, ReentrancyGuard {
 
   function setActive(bool _isActive) public onlyOwner {
     isActive = _isActive;
+  }
+  
+  function setWlActive(bool _wlIsActive) public onlyOwner {
+    wlIsActive = _wlIsActive;
   }
 
   function setPrice(uint256 _mintPrice) public onlyOwner() {
@@ -81,7 +86,7 @@ contract Optinauts is ERC721, Ownable, ReentrancyGuard {
   ) public payable nonReentrant {
     address sender = _msgSender();
 
-    require(isActive, "Whitelist sale is not open");
+    require(wlIsActive, "Whitelist sale is not open");
     require(_verify(merkleProof, sender, maxWhitelistMint), "You are not whitelisted");
     require(amount <= maxWhitelistMint - _alreadyMinted[sender], "Insufficient mints left");
     require(msg.value == mintPrice * amount, "Incorrect payable amount");
