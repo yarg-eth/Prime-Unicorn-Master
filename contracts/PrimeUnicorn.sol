@@ -9,8 +9,8 @@ import "@openzeppelin/contracts/utils/Strings.sol";
 import "@openzeppelin/contracts/utils/Counters.sol";
 import { IERC165 } from "@openzeppelin/contracts/interfaces/IERC2981.sol";
 
-contract Optinauts is ERC721, Ownable, ReentrancyGuard {
-  
+contract PrimeUnicorn is ERC721, Ownable, ReentrancyGuard {
+  //@dev Using Counters to reduce cost of gas in comparison to ERC721Enumerable
   using Strings for uint256;
   using Counters for Counters.Counter;
   Counters.Counter private _tokenSupply;
@@ -20,7 +20,7 @@ contract Optinauts is ERC721, Ownable, ReentrancyGuard {
   uint256 public maxMint = 10;
 
   string public baseURI;
-
+//@dev set whiteList mint as active and public mint as active.
   bool public isActive = false;
   bool public wlIsActive = false;
 
@@ -29,16 +29,16 @@ contract Optinauts is ERC721, Ownable, ReentrancyGuard {
   bytes32 public merkleRoot;
   mapping(address => bool) public whitelistClaimed;
   mapping(address => uint256) private _alreadyMinted;
-
+//@dev Addresses set to split payments. This may be removed prior to launch(Gnosis Vault)
   address public t1 = 0x6d6257976bd82720A63fb1022cC68B6eE7c1c2B0;
   address public t2 = 0x74Fac8b17237e00724E06d20115b7ecFA3389281;
   address public t3 = 0xb2e7e393E8C6Dfe9c311ce786e1E68459253839c;
   address public t4 = 0xCaA8aEd2B9765461d6318f01223Da08964f955C3;
-  //mainnet = 0xa5409ec958c83c3f309868babaca7c86dcb077c1
+  
 
   constructor(
     string memory _initialBaseURI
-  ) ERC721("Optinauts", "OPTI") {
+  ) ERC721("PrimeUnicorn", "PUNI") {
     baseURI = _initialBaseURI;
   }
 
@@ -111,7 +111,7 @@ contract Optinauts is ERC721, Ownable, ReentrancyGuard {
     _alreadyMinted[sender] += amount;
     _internalMint(sender, amount);
   }
-
+// Payment Split
   function withdrawAll() public payable onlyOwner {
         uint256 _each = address(this).balance / 4;
         require(payable(t1).send(_each), "Account is being paid out");
@@ -129,7 +129,7 @@ contract Optinauts is ERC721, Ownable, ReentrancyGuard {
       _safeMint(to, _tokenSupply.current());
     }
   }
-
+// Merkle Proof verify
   function _verify(
     bytes32[] calldata merkleProof,
     address sender,

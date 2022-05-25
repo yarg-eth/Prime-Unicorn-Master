@@ -4,7 +4,7 @@ pragma solidity ^0.8.0;
 
 import "@openzeppelin/contracts/finance/PaymentSplitter.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
-
+//@dev This will probably be removed due to better options. Keeping it for now just in case.
 contract paySplit is PaymentSplitter, Ownable {
     
     constructor (address[] memory _payees, uint256[] memory _shares) PaymentSplitter(_payees, _shares) payable onlyOwner {}

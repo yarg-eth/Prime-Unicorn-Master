@@ -14,13 +14,13 @@ async function main() {
   // await hre.run('compile');
 
   // We get the contract to deploy
-  const Optinauts = await hre.ethers.getContractFactory("Optinauts");
+  const Optinauts = await hre.ethers.getContractFactory("PrimeUnicorn");
   const optinauts = await Optinauts.deploy("https://gateway.pinata.cloud/ipfs/Qme6dCutqqY4immM3b2u88A2hU1ExjKpG2h1T74dnZTSu5/giphy.gif");
   //mainnet = 0xa5409ec958c83c3f309868babaca7c86dcb077c1
 
   await optinauts.deployed();
 
-  console.log("Optinauts deployed to:", optinauts.address);
+  console.log("Prime Unicorn NFTs deployed to:", primeunicorn.address);
 }
 
 // We recommend this pattern to be able to use async/await everywhere
