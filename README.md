@@ -1,4 +1,6 @@
-# Advanced Sample Hardhat Project
+# Keeping this here until I make this public for launch for my own utility.
+
+# Still need to unit test the contract using Waffle. I have not had the time to look into learning it as I have been trying to focus on React.
 
 This project demonstrates an advanced Hardhat use case, integrating other tools commonly used alongside Hardhat in the ecosystem.
 
