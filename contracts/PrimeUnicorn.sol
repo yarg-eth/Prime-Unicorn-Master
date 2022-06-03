@@ -16,8 +16,8 @@ contract PrimeUnicorn is ERC721, Ownable, ReentrancyGuard {
   Counters.Counter private _tokenSupply;
 
   uint256 public constant MAX_SUPPLY = 10000;
-  uint256 public maxWhitelistMint = 2;
-  uint256 public maxMint = 10;
+  uint256 public maxWhitelistMint = 1;
+  uint256 public maxMint = 5;
 
   string public baseURI;
 //@dev set whiteList mint as active and public mint as active.
