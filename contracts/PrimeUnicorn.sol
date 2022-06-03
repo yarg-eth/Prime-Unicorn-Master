@@ -31,9 +31,6 @@ contract PrimeUnicorn is ERC721, Ownable, ReentrancyGuard {
   mapping(address => uint256) private _alreadyMinted;
 //@dev Addresses set to split payments. This may be removed prior to launch(Gnosis Vault)
   address public t1 = 0x6d6257976bd82720A63fb1022cC68B6eE7c1c2B0;
-  address public t2 = 0x74Fac8b17237e00724E06d20115b7ecFA3389281;
-  address public t3 = 0xb2e7e393E8C6Dfe9c311ce786e1E68459253839c;
-  address public t4 = 0xCaA8aEd2B9765461d6318f01223Da08964f955C3;
   
 
   constructor(
@@ -99,7 +96,7 @@ contract PrimeUnicorn is ERC721, Ownable, ReentrancyGuard {
     _internalMint(to, amount);
   }
 
-  function publicMint(
+  function mint(
     uint256 amount
   ) public payable nonReentrant {
     address sender = _msgSender();
@@ -113,11 +110,8 @@ contract PrimeUnicorn is ERC721, Ownable, ReentrancyGuard {
   }
 // Payment Split
   function withdrawAll() public payable onlyOwner {
-        uint256 _each = address(this).balance / 4;
+        uint256 _each = address(this).balance;
         require(payable(t1).send(_each), "Account is being paid out");
-        require(payable(t2).send(_each), "Account is being paid out");
-        require(payable(t3).send(_each), "Account is being paid out");
-        require(payable(t4).send(_each), "Account is being paid out");
     }
   // Private
 
