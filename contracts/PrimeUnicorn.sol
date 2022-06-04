@@ -26,11 +26,11 @@ contract PrimeUnicorn is ERC721, Ownable, ReentrancyGuard {
 
   uint256 public mintPrice = 0.15 ether;
 
-  bytes32 public merkleRoot;
   mapping(address => bool) public whitelistClaimed;
   mapping(address => uint256) private _alreadyMinted;
 //@dev Addresses set to split payments. This may be removed prior to launch(Gnosis Vault)
   address public t1 = 0x6d6257976bd82720A63fb1022cC68B6eE7c1c2B0;
+  bytes32 public merkleRoot = 0x08836deb6ff693fd7bb95efe0eb6acaa69324214024242c651d2175750266643;
   
 
   constructor(
@@ -52,10 +52,6 @@ contract PrimeUnicorn is ERC721, Ownable, ReentrancyGuard {
   function setPrice(uint256 _mintPrice) public onlyOwner() {
         mintPrice = _mintPrice;
     }
-
-  function setMerkleProof(bytes32 _merkleRoot) public onlyOwner {
-    merkleRoot = _merkleRoot;
-  }
 
   function remainingSupply() public view returns (uint256) {
     return MAX_SUPPLY - _tokenSupply.current();
@@ -83,8 +79,9 @@ contract PrimeUnicorn is ERC721, Ownable, ReentrancyGuard {
   ) public payable nonReentrant {
     address sender = _msgSender();
 
+    bytes32 leaf = keccak256(abi.encodePacked(msg.sender));
     require(wlIsActive, "Whitelist sale is not open");
-    require(_verify(merkleProof, sender, maxWhitelistMint), "You are not whitelisted");
+    require(MerkleProof.verify(merkleProof, merkleRoot, leaf), "You are not whitelisted");
     require(amount <= maxWhitelistMint - _alreadyMinted[sender], "Insufficient mints left");
     require(msg.value == mintPrice * amount, "Incorrect payable amount");
 
