@@ -2,15 +2,14 @@
 pragma solidity ^0.8.9;
 
 import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
-import "@openzeppelin/contracts-ethereum-package/contracts/ownership/Ownable.sol";
-import "@openzeppelin/contracts-ethereum-package/contracts/Initializable.sol";
+import "@openzeppelin/openzeppelin-contracts/contracts/Ownable.sol";
 import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 import "@openzeppelin/contracts/utils/cryptography/MerkleProof.sol";
 import "@openzeppelin/contracts/utils/Strings.sol";
 import "@openzeppelin/contracts/utils/Counters.sol";
 import { IERC165 } from "@openzeppelin/contracts/interfaces/IERC2981.sol";
 
-contract PrimeUnicorn is ERC721, OwnableUpgradeSafe, ReentrancyGuard {
+contract PrimeUnicorn is ERC721, Ownable, ReentrancyGuard {
   //@dev Using Counters to reduce cost of gas in comparison to ERC721Enumerable
   using Strings for uint256;
   using Counters for Counters.Counter;
@@ -121,10 +120,7 @@ contract PrimeUnicorn is ERC721, OwnableUpgradeSafe, ReentrancyGuard {
       _safeMint(to, _tokenSupply.current());
     }
   }
-//Owner
-  function initialize() public initializer {
-    __Ownable_init();
-}
+
 // Merkle Proof verify
   function _verify(
     bytes32[] calldata merkleProof,
