@@ -2,14 +2,15 @@
 pragma solidity ^0.8.9;
 
 import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
-import "@openzeppelin/contracts/access/Ownable.sol";
+import "@openzeppelin/contracts-ethereum-package/contracts/ownership/Ownable.sol";
+import "@openzeppelin/contracts-ethereum-package/contracts/Initializable.sol";
 import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 import "@openzeppelin/contracts/utils/cryptography/MerkleProof.sol";
 import "@openzeppelin/contracts/utils/Strings.sol";
 import "@openzeppelin/contracts/utils/Counters.sol";
 import { IERC165 } from "@openzeppelin/contracts/interfaces/IERC2981.sol";
 
-contract PrimeUnicorn is ERC721, Ownable, ReentrancyGuard {
+contract PrimeUnicorn is ERC721, OwnableUpgradeSafe, ReentrancyGuard {
   //@dev Using Counters to reduce cost of gas in comparison to ERC721Enumerable
   using Strings for uint256;
   using Counters for Counters.Counter;
@@ -30,7 +31,7 @@ contract PrimeUnicorn is ERC721, Ownable, ReentrancyGuard {
   mapping(address => uint256) private _alreadyMinted;
 //@dev Addresses set to split payments. This may be removed prior to launch(Gnosis Vault)
   address public t1 = 0x6d6257976bd82720A63fb1022cC68B6eE7c1c2B0;
-  bytes32 public merkleRoot = 0x08836deb6ff693fd7bb95efe0eb6acaa69324214024242c651d2175750266643;
+  bytes32 public merkleRoot = 0x124b19893025d4e87ff13495dae82ccfbc6e73a775400e66eec2ee0b1de5ec41;
   
 
   constructor(
@@ -120,6 +121,10 @@ contract PrimeUnicorn is ERC721, Ownable, ReentrancyGuard {
       _safeMint(to, _tokenSupply.current());
     }
   }
+//Owner
+  function initialize() public initializer {
+    __Ownable_init();
+}
 // Merkle Proof verify
   function _verify(
     bytes32[] calldata merkleProof,
