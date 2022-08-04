@@ -31,7 +31,7 @@ contract PrimeUnicorn is ERC721, Ownable, ReentrancyGuard {
     //@dev Addresses set to split payments. This may be removed prior to launch(Gnosis Vault)
     address public t1 = 0x6d6257976bd82720A63fb1022cC68B6eE7c1c2B0;
     bytes32 public merkleRoot =
-        0x9dd4abe5fc45c69c94c289ef41be2967a7892d0d00f97a7d32677861fde4a883;
+        0xacfb928651bb0ca9be7cdc730d00ca6a51e5b0db2fe019cecc5c521a565fb7f4;
 
     constructor(string memory _initialBaseURI) ERC721("PrimeUnicorn", "PUNI") {
         baseURI = _initialBaseURI;
@@ -49,6 +49,10 @@ contract PrimeUnicorn is ERC721, Ownable, ReentrancyGuard {
 
     function setPrice(uint256 _mintPrice) public onlyOwner {
         mintPrice = _mintPrice;
+    }
+
+    function setRoot(bytes32 _merkleRoot) public onlyOwner {
+        merkleRoot = _merkleRoot;
     }
 
     function remainingSupply() public view returns (uint256) {
